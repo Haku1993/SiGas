@@ -40,8 +40,9 @@ void Body::timestep(double dt)
 }
 
 // function declarations
-void set_masses(Body bodies[]);
 
+void set_masses(Body bodies[]);
+ 
 void compute_forces(Body bodies[]);
 void start(Body bodies[], double dt);
 void evolve(Body bodies[], double dt);
@@ -59,9 +60,10 @@ int main(void)
   Body bodies[N];
 
   bodies[0].rad = 0.45;
-  bodies[0].Rx = 0;
+  bodies[0].Rx = 5;
   bodies[0].Ry = 4.545;
-  bodies[0].Vx = 0.0;
+  bodies[0].Vx = 0.4;
+  
   set_masses(bodies);
   compute_forces(bodies);
 
@@ -69,8 +71,8 @@ int main(void)
 
   start(bodies, DT);
 
-  for (int it = 0; it < 2000; ++it) {
-    fout << DT*it << "  " << bodies[0].Ry << std::endl; 
+  for (int it = 0; it < 5000; ++it) {
+    fout << DT*it << " , " << bodies[0].Ry << std::endl; 
     compute_forces(bodies);
     evolve(bodies, DT);
     print_to_gnuplot(bodies);
@@ -107,13 +109,31 @@ void compute_forces(Body bodies[])
     bodies[ii].Fy += -bodies[ii].mass*G;
   }
 
-  // add force with bottom wall
+  // add force with bottom wall y
   for (ii = 0; ii < N; ++ii) {
     delta = bodies[ii].rad - bodies[ii].Ry;
     if (delta > 0) {
       bodies[ii].Fy += K*delta;
+     }
+   }
+
+   // add force with bottom wall R left
+  for (ii = 0; ii < N; ++ii) {
+    delta = bodies[ii].rad - bodies[ii].Rx;
+    if (delta > 0) {
+      bodies[ii].Fx += K*delta;
+     }
+   }
+   
+
+ 
+    // add force with bottom wall R left
+   for (ii = 0; ii < N; ++ii) {
+    delta = bodies[ii].rad - (10-bodies[ii].Rx);
+     if (delta > 0) {
+       bodies[ii].Fx += -K*delta;
+      }
     }
-  } 
 }
 
 
@@ -139,7 +159,7 @@ void init_gnuplot(void)
   std::cout << "set size ratio -1" << std::endl;
   std::cout << "set parametric" << std::endl;
   std::cout << "set trange [0:1]" << std::endl;
-  std::cout << "set xrange [-1:4]" << std::endl;
+  std::cout << "set xrange [-1:10]" << std::endl;
   std::cout << "set yrange [-1:11]" << std::endl;
 }
 
