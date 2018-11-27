@@ -62,7 +62,7 @@ int main(void)
   bodies[0].rad = 0.45;
   bodies[0].Rx = 5;
   bodies[0].Ry = 4.545;
-  bodies[0].Vx = 0.4;
+  bodies[0].Vx = 0.4; // you can modify the initial speed
   
   set_masses(bodies);
   compute_forces(bodies);
@@ -117,7 +117,7 @@ void compute_forces(Body bodies[])
      }
    }
 
-   // add force with bottom wall R left
+   // add force with bottom wall x left
   for (ii = 0; ii < N; ++ii) {
     delta = bodies[ii].rad - bodies[ii].Rx;
     if (delta > 0) {
@@ -127,7 +127,7 @@ void compute_forces(Body bodies[])
    
 
  
-    // add force with bottom wall R left
+    // add force with bottom wall x rigth
    for (ii = 0; ii < N; ++ii) {
     delta = bodies[ii].rad - (10-bodies[ii].Rx);
      if (delta > 0) {
