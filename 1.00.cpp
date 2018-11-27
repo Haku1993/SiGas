@@ -1,13 +1,17 @@
-
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
+#include <cmath>
+#include <stdlib.h>
+using namespace std;
+
 
 // global constants
-const int N = 1;
+const int N = 32;
 const double G = 9.81; // m/s^2
-const double DT = 0.01; // m/s^2
+const double DT = 0.01; // s^2
 const double K = 300.234; // N/m
+const double V = 0.2; // m/s
 
 // body class
 struct Body {
@@ -53,17 +57,22 @@ void print_to_gnuplot(Body bodies[]);
 // main
 int main(void)
 {
+  int a,b;
   srand(0); //random seed
 
   std::ofstream fout("datos.txt");
-
-  Body bodies[N];
-
-  bodies[0].rad = 0.45;
-  bodies[0].Rx = 5;
-  bodies[0].Ry = 4.545;
-  bodies[0].Vx = 0.4; // you can modify the initial speed
   
+  Body bodies[N];
+  for(int i=0; i < N; ++i){
+   a= rand()%10;
+   b= rand()%10; 
+   bodies[i].rad = 0.45;
+   bodies[i].Rx = rand()%10; // random position  in x
+   bodies[i].Ry = rand()%10; // random position in y
+   bodies[i].Vx =0.4;  //a/(sqrt(a*a+b*b))*V*pow(-1,i) ;
+ //  bodies[i].Vy = b/(sqrt(a*a+b*b))*V*pow(-1,i) ;
+  }
+
   set_masses(bodies);
   compute_forces(bodies);
 
@@ -161,6 +170,7 @@ void init_gnuplot(void)
   std::cout << "set trange [0:1]" << std::endl;
   std::cout << "set xrange [-1:10]" << std::endl;
   std::cout << "set yrange [-1:11]" << std::endl;
+  std::cout << "unset key" << std::endl; //---> quita nombre de los  graficos.
 }
 
 
