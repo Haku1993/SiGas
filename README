@@ -1,1 +1,6 @@
 Repositorio de desarrollo de una simulacion de un gas ideal corpuscular.
+Para comipilar usar: 
+$ g++ 1.00.cpp  -std=c++11
+./a.out | gnuplot
+
+
