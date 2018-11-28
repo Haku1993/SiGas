@@ -7,9 +7,9 @@ using namespace std;
 
 
 // global constants
-const int N = 32;
+const int N = 6;
 const double G = 9.81; // m/s^2
-const double DT = 0.01; // s^2
+const double DT = 0.0005; // s^2
 const double K = 300.234; // N/m
 const double V = 0.2; // m/s
 
@@ -143,6 +143,28 @@ void compute_forces(Body bodies[])
        bodies[ii].Fx += -K*delta;
       }
     }
+
+  // fuerza with other bodies
+  int jj;
+  double Rijx, Rijy, Rij, Fx, Fy;
+  for (ii = 0; ii < N; ++ii) {
+    for (jj = ii+1; jj < N; ++jj) {
+      Rijx = bodies[ii].Rx - bodies[jj].Rx;
+      Rijy = bodies[ii].Ry - bodies[jj].Ry;
+      Rij = std::sqrt(Rijx*Rijx + Rijy*Rijy);
+      delta = bodies[ii].rad + bodies[jj].rad - Rij;
+      if (delta > 0) {
+	Fx = K*delta*Rijx/Rij;
+	Fy = K*delta*Rijy/Rij;
+	bodies[ii].Fx += Fx;
+	bodies[ii].Fy += Fy;
+	bodies[jj].Fx -= Fx;
+	bodies[jj].Fy -= Fy;
+      }
+    }
+  }  
+
+
 }
 
 
