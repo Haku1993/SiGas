@@ -6,14 +6,18 @@
 using namespace std;
 
 
-// global constants
-const int N = 6;
+//-------- global constants----------
+const int N = 100;
 const double G = 9.81; // m/s^2
-const double DT = 0.0005; // s^2
+const double DT = 0.01; // s^2 -> step size
 const double K = 300.234; // N/m
 const double V = 0.2; // m/s
+const double Lx=100; // size of the box in X 
+const double Ly=150;// size of the box in Y
+const double long_time=1000000; // number of time steps
+unsigned t0, t1; // relog
 
-// body class
+//-------- body class ------------
 struct Body {
   double Rxold = 0, Ryold = 0, Rx = 0, Ry = 0, Vx = 0, Vy = 0, Fx = 0, Fy = 0;
   double mass = 0;
@@ -43,7 +47,7 @@ void Body::timestep(double dt)
   Ryold = tmp;
 }
 
-// function declarations
+// ------ function declarations----------
 
 void set_masses(Body bodies[]);
  
@@ -54,9 +58,9 @@ void evolve(Body bodies[], double dt);
 void init_gnuplot(void);
 void print_to_gnuplot(Body bodies[]);
 
-// main
+// --------- (( MAIN )) ----------------
 int main(void)
-{
+{ t0=clock(); // init clock
   int a,b;
   srand(0); //random seed
 
@@ -66,9 +70,9 @@ int main(void)
   for(int i=0; i < N; ++i){
    a= rand()%10;
    b= rand()%10; 
-   bodies[i].rad = 0.45;
-   bodies[i].Rx = rand()%10; // random position  in x
-   bodies[i].Ry = rand()%10; // random position in y
+   bodies[i].rad = 1;
+   bodies[i].Rx = rand()%100; // random position  in x
+   bodies[i].Ry = rand()%100; // random position in y
    bodies[i].Vx =0.4;  //a/(sqrt(a*a+b*b))*V*pow(-1,i) ;
  //  bodies[i].Vy = b/(sqrt(a*a+b*b))*V*pow(-1,i) ;
   }
@@ -80,7 +84,7 @@ int main(void)
 
   start(bodies, DT);
 
-  for (int it = 0; it < 5000; ++it) {
+  for (int it = 0; it < long_time; ++it) {
     fout << DT*it << " , " << bodies[0].Ry << std::endl; 
     compute_forces(bodies);
     evolve(bodies, DT);
@@ -88,7 +92,9 @@ int main(void)
   }
 
   fout.close();
-
+  t1 = clock(); // finsh clock
+  double time = (double(t1-t0)/CLOCKS_PER_SEC); 
+  cout << "Time: " << time << endl; // print the time
   return 0;
 }
 
@@ -101,13 +107,13 @@ void set_masses(Body bodies[])
 }
 
 
-// function definitions
+//--------- function definitions-----------
 void compute_forces(Body bodies[])
 {
   int ii;
   double delta;
 
-  // reset forces
+  // ---------reset forces----------
   for (ii = 0; ii < N; ++ii) {
     bodies[ii].Fx = 0.0;
     bodies[ii].Fy = 0.0;
@@ -118,7 +124,7 @@ void compute_forces(Body bodies[])
     bodies[ii].Fy += -bodies[ii].mass*G;
   }
 
-  // add force with bottom wall y
+  //-------- add force with bottom wall y -----------
   for (ii = 0; ii < N; ++ii) {
     delta = bodies[ii].rad - bodies[ii].Ry;
     if (delta > 0) {
@@ -126,7 +132,7 @@ void compute_forces(Body bodies[])
      }
    }
 
-   // add force with bottom wall x left
+   //------ add force with bottom wall x left------
   for (ii = 0; ii < N; ++ii) {
     delta = bodies[ii].rad - bodies[ii].Rx;
     if (delta > 0) {
@@ -136,15 +142,15 @@ void compute_forces(Body bodies[])
    
 
  
-    // add force with bottom wall x rigth
+    //----- add force with bottom wall x rigth ----- 
    for (ii = 0; ii < N; ++ii) {
-    delta = bodies[ii].rad - (10-bodies[ii].Rx);
+    delta = bodies[ii].rad - (Lx-bodies[ii].Rx);
      if (delta > 0) {
        bodies[ii].Fx += -K*delta;
       }
     }
 
-  // fuerza with other bodies
+  // ----- fuerza with other bodies -----
   int jj;
   double Rijx, Rijy, Rij, Fx, Fy;
   for (ii = 0; ii < N; ++ii) {
@@ -183,15 +189,15 @@ void evolve(Body bodies[], double dt)
     bodies[ii].timestep(dt);
   }
 }
-
+//---- Graphing ----------
 
 void init_gnuplot(void)
 {
   std::cout << "set size ratio -1" << std::endl;
   std::cout << "set parametric" << std::endl;
   std::cout << "set trange [0:1]" << std::endl;
-  std::cout << "set xrange [-1:10]" << std::endl;
-  std::cout << "set yrange [-1:11]" << std::endl;
+   std::cout << "set xrange [0:" << Lx << "]" << std::endl; 
+  std::cout  << "set yrange [0: "<< Ly << "]" << std::endl;
   std::cout << "unset key" << std::endl; //---> quita nombre de los  graficos.
 }
 
